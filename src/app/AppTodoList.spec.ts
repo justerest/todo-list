@@ -25,11 +25,19 @@ describe('AppTodoList', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+changes should emit after resolve()', async () => {
+  it('+add() should emit changes', async () => {
+    const spy = jasmine.createSpy();
+    todoList.changes.subscribe(spy);
+    todoList.add({ title: 'title' });
+    await delay(1);
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('+add() should emit changes after resolve()', async () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     await todoList.resolve();
-    todoList.add('description');
+    todoList.add({ title: 'title' });
     await delay(1);
     expect(spy).toHaveBeenCalledTimes(2);
   });

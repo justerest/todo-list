@@ -1,7 +1,8 @@
 import React from 'react';
 
+import { TodoParams, TodoType } from 'src/core/TodoFactory';
 import { delay } from 'src/utils/delay';
-import { TodoList, TodoListImp } from '../core/TodoList';
+import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './TodoRenderer';
 
@@ -30,11 +31,18 @@ export class App extends React.Component {
   }
 
   private createTodoList(): AppTodoList {
-    const todoList = new TodoListImp();
-    todoList.add('Initial created Todo');
-    todoList.addFixedTodo('Initial created Fixed Todo');
-    todoList.addEditableTodo('Initial created Editable Todo');
-    return new AppTodoList({ getItems: async () => todoList.getItems(), save: () => delay(500) });
+    const todoParams: TodoParams[] = [
+      { title: 'Initial created Todo', type: TodoType.Simple },
+      { title: 'Initial created Fixed Todo', type: TodoType.Fixed },
+      { title: 'Initial created Editable Todo', type: TodoType.Editable },
+    ];
+    return new AppTodoList({
+      getItems: async () => {
+        await delay(1000);
+        return todoParams;
+      },
+      save: () => delay(500),
+    });
   }
 }
 
@@ -56,17 +64,33 @@ export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
 };
 
 export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
-  <button onClick={() => todoList.add(`Todo ${todoList.getItems().length}`)}>Add Todo</button>
+  <button onClick={() => todoList.add({ title: `Todo ${todoList.getItems().length}` })}>
+    Add Todo
+  </button>
 );
 
 export const AddFixedTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
-  <button onClick={() => todoList.addFixedTodo(`Fixed Todo ${todoList.getItems().length}`)}>
+  <button
+    onClick={() =>
+      todoList.add({
+        title: `Fixed Todo ${todoList.getItems().length}`,
+        type: TodoType.Fixed,
+      })
+    }
+  >
     Add Fixed Todo
   </button>
 );
 
 export const AddEditableTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
-  <button onClick={() => todoList.addEditableTodo(`Editable Todo ${todoList.getItems().length}`)}>
+  <button
+    onClick={() =>
+      todoList.add({
+        title: `Editable Todo ${todoList.getItems().length}`,
+        type: TodoType.Editable,
+      })
+    }
+  >
     Add Editable Todo
   </button>
 );

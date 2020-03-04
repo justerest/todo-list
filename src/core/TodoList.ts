@@ -1,23 +1,25 @@
 import { Observable, Subject } from 'src/utils/Observable';
-import { EditableTodo } from './EditableTodo';
-import { FixedTodo } from './FixedTodo';
 import { Todo } from './Todo';
+import { TodoFactory, TodoParams } from './TodoFactory';
 
 export interface TodoList {
   readonly changes: Observable;
   getItems(): Todo[];
   getCompletedItems(): Todo[];
   getUncompletedItems(): Todo[];
-  add(description: string): void;
-  addFixedTodo(description: string): void;
-  addEditableTodo(description: string): void;
+  add(todoParams: TodoParams): void;
 }
 
 export class TodoListImp implements TodoList {
-  private items: Todo[] = [];
+  private items: Todo[];
   private changesSubject = new Subject();
+  private todoFactory = new TodoFactory();
 
   readonly changes: Observable = this.changesSubject.asObservable();
+
+  constructor(todoParamsList: TodoParams[] = []) {
+    this.items = todoParamsList.map((todoParams) => this.createTodo(todoParams));
+  }
 
   getItems(): Todo[] {
     return this.items;
@@ -31,18 +33,13 @@ export class TodoListImp implements TodoList {
     return this.items.filter((todo) => !todo.isCompleted());
   }
 
-  add(description: string): void {
-    this.items.push(new Todo(description, () => this.changesSubject.next({})));
+  add(todoParams: TodoParams): void {
+    const todo = this.createTodo(todoParams);
+    this.items.push(todo);
     this.changesSubject.next({});
   }
 
-  addFixedTodo(description: string): void {
-    this.items.push(new FixedTodo(description));
-    this.changesSubject.next({});
-  }
-
-  addEditableTodo(description: string): void {
-    this.items.push(new EditableTodo(description, () => this.changesSubject.next({})));
-    this.changesSubject.next({});
+  private createTodo(todoParams: TodoParams): Todo {
+    return this.todoFactory.createTodo(todoParams, () => this.changesSubject.next({}));
   }
 }

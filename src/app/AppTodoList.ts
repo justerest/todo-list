@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'src/utils/Observable';
+import { Observable, Subject, Subscription } from 'src/utils/Observable';
 import { Todo } from '../core/Todo';
 import { TodoParams } from '../core/TodoFactory';
 import { TodoList, TodoListImp } from '../core/TodoList';
@@ -10,16 +10,26 @@ export interface TodoListApi {
 
 export class AppTodoList implements TodoList {
   private changesSubject = new Subject();
-  private state: TodoList = new TodoListImp();
 
   changes: Observable = this.changesSubject.asObservable();
+
+  private state: TodoList = new TodoListImp();
+  private subscription: Subscription = this.state.changes.subscribe(() =>
+    this.changesSubject.next({}),
+  );
 
   constructor(private api: TodoListApi) {}
 
   async resolve(): Promise<void> {
-    const todoItems = await this.api.getItems();
-    this.state = new TodoListImp(todoItems);
+    const todoParamsList = await this.api.getItems();
+    this.state = new TodoListImp(todoParamsList);
+    this.subscription.unsubscribe();
+    this.subscription = this.state.changes.subscribe(() => this.changesSubject.next({}));
     this.changesSubject.next({});
+  }
+
+  destroy(): void {
+    this.subscription.unsubscribe();
   }
 
   getItems(): Todo[] {
@@ -34,24 +44,7 @@ export class AppTodoList implements TodoList {
     return this.state.getUncompletedItems();
   }
 
-  add(description: string): void {
-    this.api.save(this.state).then(() => {
-      this.state.add(description);
-      this.changesSubject.next({});
-    });
-  }
-
-  addFixedTodo(description: string): void {
-    this.api.save(this.state).then(() => {
-      this.state.addFixedTodo(description);
-      this.changesSubject.next({});
-    });
-  }
-
-  addEditableTodo(description: string): void {
-    this.api.save(this.state).then(() => {
-      this.state.addEditableTodo(description);
-      this.changesSubject.next({});
-    });
+  add(todoParams: TodoParams): void {
+    this.api.save(this.state).then(() => this.state.add(todoParams));
   }
 }
