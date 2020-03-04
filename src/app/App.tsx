@@ -1,8 +1,7 @@
 import React from 'react';
 
-import { FixedTodo } from './core/FixedTodo';
-import { Todo } from './core/Todo';
-import { TodoList } from './core/TodoList';
+import { TodoList } from '../core/TodoList';
+import { TodoCmp } from './TodoCmp';
 
 export class App extends React.Component {
   todoList: TodoList = this.createTodoList();
@@ -49,18 +48,6 @@ export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
     </div>
   );
 };
-
-export const TodoCmp: React.FC<{ todo: Todo }> = ({ todo }) => (
-  <li
-    style={{
-      textDecoration: todo.isCompleted() ? 'line-through' : '',
-      cursor: todo instanceof FixedTodo ? 'not-allowed' : 'pointer',
-    }}
-    onClick={() => todo.toggleCompletion()}
-  >
-    {todo.getTitle()}
-  </li>
-);
 
 export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
   <button onClick={() => todoList.add(`Todo ${todoList.getItems().length}`)}>Add Todo</button>
