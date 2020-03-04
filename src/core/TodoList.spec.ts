@@ -61,6 +61,14 @@ describe('TodoList', () => {
     expect(spy).toHaveBeenCalled();
   });
 
+  it('+addFixedTodo() should emit changes', async () => {
+    const spy = jasmine.createSpy();
+    todoList.changes.subscribe(spy);
+    todoList.addFixedTodo('description');
+    await delay();
+    expect(spy).toHaveBeenCalled();
+  });
+
   it('+todo.toggleCompletion() should emit changes', async () => {
     todoList.add('description');
     await delay();

@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { FixedTodo } from './core/FixedTodo';
 import { Todo } from './core/Todo';
 import { TodoList } from './core/TodoList';
 
@@ -15,6 +16,7 @@ export class App extends React.Component {
         <main>
           <TodoListCmp todoList={this.todoList}></TodoListCmp>
           <AddTodoCmp todoList={this.todoList}></AddTodoCmp>
+          <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
         </main>
       </React.Fragment>
     );
@@ -27,6 +29,7 @@ export class App extends React.Component {
   private createTodoList(): TodoList {
     const todoList = new TodoList();
     todoList.add('Initial created Todo');
+    todoList.addFixedTodo('Initial created Fixed Todo');
     return todoList;
   }
 }
@@ -49,13 +52,22 @@ export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
 
 export const TodoCmp: React.FC<{ todo: Todo }> = ({ todo }) => (
   <li
-    style={{ textDecoration: todo.isCompleted() ? 'line-through' : '' }}
+    style={{
+      textDecoration: todo.isCompleted() ? 'line-through' : '',
+      cursor: todo instanceof FixedTodo ? 'not-allowed' : 'pointer',
+    }}
     onClick={() => todo.toggleCompletion()}
   >
     {todo.getTitle()}
   </li>
 );
 
-export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
-  return <button onClick={() => todoList.add(`Todo ${todoList.getItems().length}`)}>Add</button>;
-};
+export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
+  <button onClick={() => todoList.add(`Todo ${todoList.getItems().length}`)}>Add Todo</button>
+);
+
+export const AddFixedTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
+  <button onClick={() => todoList.addFixedTodo(`Fixed Todo ${todoList.getItems().length}`)}>
+    Add Fixed Todo
+  </button>
+);
