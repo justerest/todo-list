@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { TodoList } from '../core/TodoList';
-import { TodoCmp } from './TodoCmp';
+import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
   todoList: TodoList = this.createTodoList();
@@ -30,20 +30,22 @@ export class App extends React.Component {
     const todoList = new TodoList();
     todoList.add('Initial created Todo');
     todoList.addFixedTodo('Initial created Fixed Todo');
+    todoList.addEditableTodo('Initial created Editable Todo');
     return todoList;
   }
 }
 
 export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
+  const todoRenderer = new TodoRenderer();
   return (
     <div>
       <h2>What to do?</h2>
       <ul>
         {todoList.getUncompletedItems().map((todo) => (
-          <TodoCmp key={todo.id} todo={todo}></TodoCmp>
+          <React.Fragment key={todo.id}>{todo.render(todoRenderer)}</React.Fragment>
         ))}
         {todoList.getCompletedItems().map((todo) => (
-          <TodoCmp key={todo.id} todo={todo}></TodoCmp>
+          <React.Fragment key={todo.id}>{todo.render(todoRenderer)}</React.Fragment>
         ))}
       </ul>
     </div>

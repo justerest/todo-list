@@ -1,3 +1,4 @@
+import { TodoRenderer } from '../app/TodoRenderer';
 import { generateId } from '../utils/generateId';
 
 export class Todo {
@@ -18,5 +19,9 @@ export class Todo {
   toggleCompletion(): void {
     this.completed = !this.completed;
     this.onChange?.(this);
+  }
+
+  render(renderer: TodoRenderer): any {
+    return renderer.renderSimpleTodo(this);
   }
 }
