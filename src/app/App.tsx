@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { TodoList } from '../core/TodoList';
+import { delay } from 'src/utils/delay';
+import { TodoList, TodoListImp } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
-  todoList: TodoList = this.createTodoList();
+  todoList: AppTodoList = this.createTodoList();
 
   render(): any {
     return (
@@ -25,14 +26,15 @@ export class App extends React.Component {
 
   componentDidMount(): void {
     this.todoList.changes.subscribe(() => this.forceUpdate());
+    this.todoList.resolve();
   }
 
-  private createTodoList(): TodoList {
-    const todoList = new AppTodoList();
+  private createTodoList(): AppTodoList {
+    const todoList = new TodoListImp();
     todoList.add('Initial created Todo');
     todoList.addFixedTodo('Initial created Fixed Todo');
     todoList.addEditableTodo('Initial created Editable Todo');
-    return todoList;
+    return new AppTodoList({ getItems: async () => todoList.getItems(), save: () => delay(500) });
   }
 }
 

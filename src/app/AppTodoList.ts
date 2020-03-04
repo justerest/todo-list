@@ -1,40 +1,56 @@
-import { delay } from 'src/utils/delay';
-import { Observable } from 'src/utils/Observable';
+import { Observable, Subject } from 'src/utils/Observable';
 import { Todo } from '../core/Todo';
 import { TodoList, TodoListImp } from '../core/TodoList';
 
+export interface TodoListApi {
+  getItems(): Promise<Todo[]>;
+  save(todoList: TodoList): Promise<void>;
+}
+
 export class AppTodoList implements TodoList {
-  private todoList: TodoList = new TodoListImp();
+  private changesSubject = new Subject();
+  private state: TodoList = new TodoListImp();
 
-  changes: Observable = this.todoList.changes;
+  changes: Observable = this.changesSubject.asObservable();
 
-  constructor() {}
+  constructor(private api: TodoListApi) {}
+
+  async resolve(): Promise<void> {
+    const todoItems = await this.api.getItems();
+    this.state = new TodoListImp(todoItems);
+    this.changesSubject.next({});
+  }
 
   getItems(): Todo[] {
-    return this.todoList.getItems();
+    return this.state.getItems();
   }
 
   getCompletedItems(): Todo[] {
-    return this.todoList.getCompletedItems();
+    return this.state.getCompletedItems();
   }
 
   getUncompletedItems(): Todo[] {
-    return this.todoList.getUncompletedItems();
+    return this.state.getUncompletedItems();
   }
 
   add(description: string): void {
-    apiRequest().then(() => this.todoList.add(description));
+    this.api.save(this.state).then(() => {
+      this.state.add(description);
+      this.changesSubject.next({});
+    });
   }
 
   addFixedTodo(description: string): void {
-    apiRequest().then(() => this.todoList.addFixedTodo(description));
+    this.api.save(this.state).then(() => {
+      this.state.addFixedTodo(description);
+      this.changesSubject.next({});
+    });
   }
 
   addEditableTodo(description: string): void {
-    apiRequest().then(() => this.todoList.addEditableTodo(description));
+    this.api.save(this.state).then(() => {
+      this.state.addEditableTodo(description);
+      this.changesSubject.next({});
+    });
   }
-}
-
-async function apiRequest(): Promise<void> {
-  await delay(500);
 }

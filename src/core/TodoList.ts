@@ -14,10 +14,14 @@ export interface TodoList {
 }
 
 export class TodoListImp implements TodoList {
-  private items: Todo[] = [];
+  private items: Todo[];
   private changesSubject = new Subject();
 
   readonly changes: Observable = this.changesSubject.asObservable();
+
+  constructor(items: Todo[] = []) {
+    this.items = items;
+  }
 
   getItems(): Todo[] {
     return this.items;
