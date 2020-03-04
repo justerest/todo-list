@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Todo } from './core/Todo';
 import { TodoList } from './core/TodoList';
 
 export class App extends React.Component {
@@ -35,13 +36,25 @@ export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
     <div>
       <h2>What to do?</h2>
       <ul>
-        {todoList.getItems().map((todo) => (
-          <li key={todo.getTitle()}>{todo.getTitle()}</li>
+        {todoList.getUncompletedItems().map((todo) => (
+          <TodoCmp key={todo.id} todo={todo}></TodoCmp>
+        ))}
+        {todoList.getCompletedItems().map((todo) => (
+          <TodoCmp key={todo.id} todo={todo}></TodoCmp>
         ))}
       </ul>
     </div>
   );
 };
+
+export const TodoCmp: React.FC<{ todo: Todo }> = ({ todo }) => (
+  <li
+    style={{ textDecoration: todo.isCompleted() ? 'line-through' : '' }}
+    onClick={() => todo.toggleCompletion()}
+  >
+    {todo.getTitle()}
+  </li>
+);
 
 export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
   return <button onClick={() => todoList.add(`Todo ${todoList.getItems().length}`)}>Add</button>;

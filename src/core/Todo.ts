@@ -1,5 +1,9 @@
+import { generateId } from '../utils/generateId';
+
 export class Todo {
   private completed: boolean = false;
+
+  id: string = generateId();
 
   constructor(private description: string) {}
 
