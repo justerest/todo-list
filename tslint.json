@@ -1,0 +1,57 @@
+{
+  "extends": "tslint:recommended",
+  "rules": {
+    "array-type": [true, "array-simple"],
+    "arrow-parens": true,
+    "deprecation": {
+      "severity": "warn"
+    },
+    "import-blacklist": [true, "rxjs/Rx"],
+    "indent": false,
+    "interface-name": false,
+    "max-classes-per-file": false,
+    "max-line-length": [
+      true,
+      {
+        "limit": 140,
+        "ignore-pattern": "^import |^export {(.*?)}"
+      }
+    ],
+    "member-access": false,
+    "no-consecutive-blank-lines": true,
+    "no-console": [true, "debug", "info", "time", "timeEnd", "trace"],
+    "no-empty": false,
+    "no-non-null-assertion": true,
+    "no-redundant-jsdoc": true,
+    "no-switch-case-fall-through": true,
+    "no-unused-variable": true,
+    "no-var-requires": false,
+    "no-use-before-declare": false,
+    "object-literal-key-quotes": [true, "as-needed"],
+    "one-line": false,
+    "object-literal-sort-keys": false,
+    "ordered-imports": [
+      true,
+      {
+        "grouped-imports": true,
+        "groups": [
+          { "match": "react", "order": 1 },
+          { "match": "\\.scss$", "order": 4 },
+          { "match": "(^src/)|(^\\.)", "order": 3 },
+          { "match": ".*", "order": 2 }
+        ],
+        "named-imports-order": "lowercase-last"
+      }
+    ],
+    "quotemark": [true, "single"],
+    "radix": false,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "always",
+        "singleline": "never"
+      }
+    ],
+    "typedef": [true, "call-signature"]
+  }
+}
