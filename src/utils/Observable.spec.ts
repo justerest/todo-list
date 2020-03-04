@@ -1,3 +1,4 @@
+import { delay } from './delay';
 import { Observable, Subject } from './Observable';
 
 describe('Observable', () => {
@@ -35,7 +36,3 @@ describe('Observable', () => {
     expect(spy.calls.first().args[0]).toBe(sendingValue);
   });
 });
-
-function delay(timeoutInMs?: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, timeoutInMs));
-}

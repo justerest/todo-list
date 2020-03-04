@@ -1,3 +1,4 @@
+import { delay } from 'src/utils/delay';
 import { TodoList } from './TodoList';
 
 describe('TodoList', () => {
@@ -50,5 +51,13 @@ describe('TodoList', () => {
     const [item] = todoList.getItems();
     item.toggleCompletion();
     expect(todoList.getUncompletedItems()).toEqual([]);
+  });
+
+  it('+add() should emit changes', async () => {
+    const spy = jasmine.createSpy();
+    todoList.changes.subscribe(spy);
+    todoList.add('description');
+    await delay();
+    expect(spy).toHaveBeenCalled();
   });
 });
