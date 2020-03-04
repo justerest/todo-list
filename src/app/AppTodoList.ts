@@ -1,9 +1,10 @@
 import { Observable, Subject } from 'src/utils/Observable';
 import { Todo } from '../core/Todo';
+import { TodoParams } from '../core/TodoFactory';
 import { TodoList, TodoListImp } from '../core/TodoList';
 
 export interface TodoListApi {
-  getItems(): Promise<Todo[]>;
+  getItems(): Promise<TodoParams[]>;
   save(todoList: TodoList): Promise<void>;
 }
 

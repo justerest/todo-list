@@ -1,5 +1,5 @@
-import { Todo } from 'src/core/Todo';
 import { delay } from 'src/utils/delay';
+import { TodoType } from '../core/TodoFactory';
 import { AppTodoList, TodoListApi } from './AppTodoList';
 
 describe('AppTodoList', () => {
@@ -7,7 +7,7 @@ describe('AppTodoList', () => {
 
   beforeEach(() => {
     todoList = new AppTodoList({
-      getItems: async () => [new Todo('Loaded todo')],
+      getItems: async () => [{ type: TodoType.Simple, title: 'Loaded todo', completed: false }],
       save: () => delay(),
     } as TodoListApi);
   });
