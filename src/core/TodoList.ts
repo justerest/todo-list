@@ -20,7 +20,7 @@ export class TodoList {
   }
 
   add(description: string): void {
-    this.items.push(new Todo(description));
+    this.items.push(new Todo(description, () => this.changesSubject.next({})));
     this.changesSubject.next({});
   }
 }

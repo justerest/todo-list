@@ -60,4 +60,15 @@ describe('TodoList', () => {
     await delay();
     expect(spy).toHaveBeenCalled();
   });
+
+  it('+todo.toggleCompletion() should emit changes', async () => {
+    todoList.add('description');
+    await delay();
+    const spy = jasmine.createSpy();
+    todoList.changes.subscribe(spy);
+    const [item] = todoList.getItems();
+    item.toggleCompletion();
+    await delay();
+    expect(spy).toHaveBeenCalled();
+  });
 });

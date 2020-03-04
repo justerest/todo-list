@@ -5,7 +5,7 @@ export class Todo {
 
   id: string = generateId();
 
-  constructor(private description: string) {}
+  constructor(private description: string, private onCompletionToggle?: (todo: Todo) => void) {}
 
   getTitle(): string {
     return this.description;
@@ -17,5 +17,6 @@ export class Todo {
 
   toggleCompletion(): void {
     this.completed = !this.completed;
+    this.onCompletionToggle?.(this);
   }
 }
