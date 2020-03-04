@@ -20,7 +20,7 @@ export class App extends React.Component {
   }
 
   componentDidMount(): void {
-    setInterval(() => this.forceUpdate(), 500);
+    this.todoList.changes.subscribe(() => this.forceUpdate());
   }
 
   private createTodoList(): TodoList {
