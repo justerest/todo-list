@@ -1,4 +1,5 @@
 import { Observable, Subject } from 'src/utils/Observable';
+import { EditableTodo } from './EditableTodo';
 import { FixedTodo } from './FixedTodo';
 import { Todo } from './Todo';
 
@@ -27,6 +28,11 @@ export class TodoList {
 
   addFixedTodo(description: string): void {
     this.items.push(new FixedTodo(description));
+    this.changesSubject.next({});
+  }
+
+  addEditableTodo(description: string): void {
+    this.items.push(new EditableTodo(description, () => this.changesSubject.next({})));
     this.changesSubject.next({});
   }
 }

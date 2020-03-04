@@ -16,6 +16,7 @@ export class App extends React.Component {
           <TodoListCmp todoList={this.todoList}></TodoListCmp>
           <AddTodoCmp todoList={this.todoList}></AddTodoCmp>
           <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
+          <AddEditableTodoCmp todoList={this.todoList}></AddEditableTodoCmp>
         </main>
       </React.Fragment>
     );
@@ -56,5 +57,11 @@ export const AddTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
 export const AddFixedTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
   <button onClick={() => todoList.addFixedTodo(`Fixed Todo ${todoList.getItems().length}`)}>
     Add Fixed Todo
+  </button>
+);
+
+export const AddEditableTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => (
+  <button onClick={() => todoList.addEditableTodo(`Editable Todo ${todoList.getItems().length}`)}>
+    Add Editable Todo
   </button>
 );

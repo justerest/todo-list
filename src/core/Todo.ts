@@ -5,10 +5,10 @@ export class Todo {
 
   id: string = generateId();
 
-  constructor(private description: string, private onCompletionToggle?: (todo: Todo) => void) {}
+  constructor(protected title: string, protected onChange?: (todo: Todo) => void) {}
 
   getTitle(): string {
-    return this.description;
+    return this.title;
   }
 
   isCompleted(): boolean {
@@ -17,6 +17,6 @@ export class Todo {
 
   toggleCompletion(): void {
     this.completed = !this.completed;
-    this.onCompletionToggle?.(this);
+    this.onChange?.(this);
   }
 }
