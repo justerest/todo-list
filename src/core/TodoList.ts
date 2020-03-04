@@ -3,7 +3,17 @@ import { EditableTodo } from './EditableTodo';
 import { FixedTodo } from './FixedTodo';
 import { Todo } from './Todo';
 
-export class TodoList {
+export interface TodoList {
+  readonly changes: Observable;
+  getItems(): Todo[];
+  getCompletedItems(): Todo[];
+  getUncompletedItems(): Todo[];
+  add(description: string): void;
+  addFixedTodo(description: string): void;
+  addEditableTodo(description: string): void;
+}
+
+export class TodoListImp implements TodoList {
   private items: Todo[] = [];
   private changesSubject = new Subject();
 

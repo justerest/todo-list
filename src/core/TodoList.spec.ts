@@ -1,11 +1,11 @@
 import { delay } from 'src/utils/delay';
-import { TodoList } from './TodoList';
+import { TodoList, TodoListImp } from './TodoList';
 
 describe('TodoList', () => {
   let todoList: TodoList;
 
   beforeEach(() => {
-    todoList = new TodoList();
+    todoList = new TodoListImp();
   });
 
   it('+getItems() should returns Todo[]', () => {

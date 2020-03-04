@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { TodoList } from '../core/TodoList';
+import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
@@ -27,7 +28,7 @@ export class App extends React.Component {
   }
 
   private createTodoList(): TodoList {
-    const todoList = new TodoList();
+    const todoList = new AppTodoList();
     todoList.add('Initial created Todo');
     todoList.addFixedTodo('Initial created Fixed Todo');
     todoList.addEditableTodo('Initial created Editable Todo');
