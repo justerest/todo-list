@@ -1,4 +1,4 @@
-import { TodoRenderer } from 'src/app/TodoRenderer';
+import { TodoRenderer } from 'src/app/todo-components/TodoRenderer';
 import { override } from 'src/utils/metric-decorators';
 import { Todo } from './Todo';
 

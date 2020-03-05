@@ -1,4 +1,4 @@
-import { TodoRenderer } from '../app/TodoRenderer';
+import { TodoRenderer } from '../app/todo-components/TodoRenderer';
 import { generateId } from '../utils/generateId';
 
 export class Todo {

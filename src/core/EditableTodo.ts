@@ -1,4 +1,4 @@
-import { TodoRenderer } from 'src/app/TodoRenderer';
+import { TodoRenderer } from 'src/app/todo-components/TodoRenderer';
 import { Todo } from './Todo';
 
 export class EditableTodo extends Todo {

@@ -4,9 +4,9 @@ import { TodoType } from 'src/core/TodoFactory';
 import { Observable, Subscription } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
+import { TodoRenderer } from './todo-components/TodoRenderer';
 import { TodoListApiImp } from './TodoListApi';
 import { TodoListApiProxy } from './TodoListApiProxy';
-import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
   private subscriptions: Subscription[] = [];
