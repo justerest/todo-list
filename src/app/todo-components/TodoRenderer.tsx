@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { EditableTodo } from 'src/core/EditableTodo';
-import { Todo } from '../../core/Todo';
+import { Todo } from 'src/core/Todo';
 import { EditableTodoCmp } from './EditableTodoCmp';
 import { FixedTodoCmp } from './FixedTodoCmp';
 import { SimpleTodoCmp } from './SimpleTodoCmp';

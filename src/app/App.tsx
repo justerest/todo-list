@@ -7,7 +7,7 @@ import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './todo-components/TodoRenderer';
 import { TodoListApiImp } from './TodoListApi';
 import { TodoListApiProxy } from './TodoListApiProxy';
-import { TodoListHistory } from './TodoListHistory';
+import { HistoryControl } from './TodoListHistory';
 
 export class App extends React.Component {
   private subscriptions: Subscription[] = [];
@@ -26,7 +26,7 @@ export class App extends React.Component {
           <AddTodoCmp todoList={this.todoList}></AddTodoCmp>
           <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
           <AddEditableTodoCmp todoList={this.todoList}></AddEditableTodoCmp>
-          <HistoryControlCmp todoListHistory={this.todoList.history}></HistoryControlCmp>
+          <HistoryControlCmp historyControl={this.todoList.getHistory()}></HistoryControlCmp>
         </main>
         <footer>
           <SavingStatusCmp todoListApiProxy={this.todoListApiProxy}></SavingStatusCmp>
@@ -104,16 +104,16 @@ export const SavingStatusCmp: React.FC<{
 };
 
 export const HistoryControlCmp: React.FC<{
-  todoListHistory: TodoListHistory;
-}> = ({ todoListHistory }) => {
-  useObservable(todoListHistory.changes);
+  historyControl: HistoryControl;
+}> = ({ historyControl }) => {
+  useObservable(historyControl.changes);
   return (
     <p>
-      <button disabled={!todoListHistory.hasPrev()} onClick={() => todoListHistory.switchToPrev()}>
+      <button disabled={!historyControl.hasPrev()} onClick={() => historyControl.switchToPrev()}>
         ↪️
       </button>
       &nbsp;
-      <button disabled={!todoListHistory.hasNext()} onClick={() => todoListHistory.switchToNext()}>
+      <button disabled={!historyControl.hasNext()} onClick={() => historyControl.switchToNext()}>
         ↩️
       </button>
     </p>

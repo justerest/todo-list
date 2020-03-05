@@ -1,7 +1,16 @@
 import { TodoParams } from 'src/core/TodoFactory';
 import { Observable, Subject } from 'src/utils/Observable';
 
-export class TodoListHistory {
+export interface HistoryControl<T extends object = {}> {
+  changes: Observable;
+  hasPrev(): boolean;
+  hasNext(): boolean;
+  getState(): T;
+  switchToPrev(): void;
+  switchToNext(): void;
+}
+
+export class TodoListHistory implements HistoryControl<TodoParams[]> {
   private changesSubject = new Subject();
   private history: TodoParams[][] = [this.state];
 

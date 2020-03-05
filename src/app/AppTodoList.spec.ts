@@ -1,7 +1,6 @@
 import { delay } from 'src/utils/delay';
 import { TodoType } from '../core/TodoFactory';
 import { AppTodoList } from './AppTodoList';
-import { TodoListHistory } from './TodoListHistory';
 
 describe('AppTodoList', () => {
   let todoList: AppTodoList;
@@ -87,30 +86,30 @@ describe('AppTodoList', () => {
 
   it('+resolve() should provide current todoList state to history', async () => {
     expect(todoList.getItems()).toHaveLength(0);
-    expect(todoList.history.getState()).toHaveLength(0);
+    expect(todoList.getHistory().getState()).toHaveLength(0);
     await todoList.resolve();
     await delay();
     expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.history.getState()).toHaveLength(1);
+    expect(todoList.getHistory().getState()).toHaveLength(1);
   });
 
   it('+add() should provide current todoList state to history', async () => {
     expect(todoList.getItems()).toHaveLength(0);
-    expect(todoList.history.getState()).toHaveLength(0);
+    expect(todoList.getHistory().getState()).toHaveLength(0);
     todoList.add({ title: '' });
     await delay();
     expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.history.getState()).toHaveLength(1);
+    expect(todoList.getHistory().getState()).toHaveLength(1);
   });
 
   it('+history.switchToPrev() should change todoList state on prev', async () => {
     todoList.add({ title: '' });
     await delay();
     expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.history.getState()).toHaveLength(1);
-    todoList.history.switchToPrev();
+    expect(todoList.getHistory().getState()).toHaveLength(1);
+    todoList.getHistory().switchToPrev();
     await delay();
-    expect(todoList.history.getState()).toHaveLength(0);
+    expect(todoList.getHistory().getState()).toHaveLength(0);
     expect(todoList.getItems()).toHaveLength(0);
   });
 
@@ -119,16 +118,16 @@ describe('AppTodoList', () => {
     todoList.add({ title: '' });
     await delay();
     expect(todoList.getItems()).toHaveLength(2);
-    expect(todoList.history.getState()).toHaveLength(2);
-    todoList.history.switchToPrev();
+    expect(todoList.getHistory().getState()).toHaveLength(2);
+    todoList.getHistory().switchToPrev();
     await delay();
-    expect(todoList.history.getState()).toHaveLength(1);
+    expect(todoList.getHistory().getState()).toHaveLength(1);
     expect(todoList.getItems()).toHaveLength(1);
   });
 
   it('+add() should emit changes after history.switchToPrev()', async () => {
     todoList.add({ title: '' });
-    todoList.history.switchToPrev();
+    todoList.getHistory().switchToPrev();
     await delay();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
