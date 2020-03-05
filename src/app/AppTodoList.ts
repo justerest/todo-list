@@ -2,17 +2,13 @@ import { Observable, Subject, Subscription } from 'src/utils/Observable';
 import { Todo } from '../core/Todo';
 import { TodoFactory, TodoParams } from '../core/TodoFactory';
 import { TodoList, TodoListImp } from '../core/TodoList';
-
-export interface TodoListApi {
-  getItems(): Promise<TodoParams[]>;
-  save(todoParamsList: TodoParams[]): Promise<void>;
-}
+import { TodoListApi } from './TodoListApi';
 
 export class AppTodoList implements TodoList {
   private todoFactory = new TodoFactory();
   private changesSubject = new Subject();
 
-  changes: Observable = this.changesSubject.asObservable();
+  readonly changes: Observable = this.changesSubject.asObservable();
 
   private state: TodoList = new TodoListImp();
   private subscription: Subscription = this.state.changes.subscribe(() => this.onStateChanges());

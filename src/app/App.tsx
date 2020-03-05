@@ -1,16 +1,18 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { TodoParams, TodoType } from 'src/core/TodoFactory';
-import { delay } from 'src/utils/delay';
-import { Subscription } from 'src/utils/Observable';
+import { TodoType } from 'src/core/TodoFactory';
+import { Observable, Subscription } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
+import { TodoListApiImp } from './TodoListApi';
+import { TodoListApiProxy } from './TodoListApiProxy';
 import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
   private subscriptions: Subscription[] = [];
 
-  todoList: AppTodoList = this.createTodoList();
+  readonly todoListApiProxy = new TodoListApiProxy(new TodoListApiImp());
+  readonly todoList = new AppTodoList(this.todoListApiProxy);
 
   render(): any {
     return (
@@ -24,6 +26,9 @@ export class App extends React.Component {
           <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
           <AddEditableTodoCmp todoList={this.todoList}></AddEditableTodoCmp>
         </main>
+        <footer>
+          <SavingStatusCmp todoListApiProxy={this.todoListApiProxy}></SavingStatusCmp>
+        </footer>
       </React.Fragment>
     );
   }
@@ -36,21 +41,6 @@ export class App extends React.Component {
   componentWillUnmount(): void {
     this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     this.todoList.destroy();
-  }
-
-  private createTodoList(): AppTodoList {
-    const todoParams: TodoParams[] = [
-      { title: 'Initial created Todo', type: TodoType.Simple },
-      { title: 'Initial created Fixed Todo', type: TodoType.Fixed },
-      { title: 'Initial created Editable Todo', type: TodoType.Editable },
-    ];
-    return new AppTodoList({
-      getItems: () => delay(1000).then(() => todoParams),
-      save: () =>
-        delay(500)
-          .then(() => (Math.random() > 0.25 ? Promise.resolve() : Promise.reject()))
-          .catch(() => console.error('Saving fails')),
-    });
   }
 }
 
@@ -102,3 +92,20 @@ export const AddEditableTodoCmp: React.FC<{ todoList: TodoList }> = ({ todoList 
     Add Editable Todo
   </button>
 );
+
+export const SavingStatusCmp: React.FC<{
+  todoListApiProxy: TodoListApiProxy;
+}> = ({ todoListApiProxy }) => {
+  const saving = useObservable(todoListApiProxy.saving);
+  const error = useObservable(todoListApiProxy.error);
+  return <p>{error ? 'Error 🔴' : saving ? 'Saving 🟡' : 'Saved 🟢'}</p>;
+};
+
+function useObservable<T>(observable: Observable<T>): T | undefined {
+  const [result, update] = useState(undefined as T | undefined);
+  useEffect(() => {
+    const subscription = observable.subscribe((value) => update(value));
+    return () => subscription.unsubscribe();
+  });
+  return result;
+}
