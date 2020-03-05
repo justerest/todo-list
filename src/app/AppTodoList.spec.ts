@@ -1,4 +1,5 @@
 import { delay } from 'src/utils/delay';
+import { SubjectTests } from 'src/utils/Observable';
 import { TodoType } from '../core/TodoFactory';
 import { AppTodoList } from './AppTodoList';
 
@@ -12,6 +13,10 @@ describe('AppTodoList', () => {
     });
   });
 
+  beforeAll(() => {
+    SubjectTests.useSyncResolver();
+  });
+
   it('+resolve() should load saved todo items', async () => {
     await todoList.resolve();
     expect(todoList.getItems().length).toBeGreaterThan(0);
@@ -21,15 +26,13 @@ describe('AppTodoList', () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     await todoList.resolve();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+add() should emit changes', async () => {
+  it('+add() should emit changes', () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     todoList.add({ title: '' });
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
@@ -38,26 +41,22 @@ describe('AppTodoList', () => {
     todoList.changes.subscribe(spy);
     await todoList.resolve();
     todoList.add({ title: '' });
-    await delay();
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('+todo.onChange() should emit changes', async () => {
     await todoList.resolve();
-    await delay();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     const [todo] = todoList.getItems();
     todo.toggleCompletion();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+add() should call TodoListApi.save', async () => {
+  it('+add() should call TodoListApi.save', () => {
     const spy = jasmine.createSpy();
     todoList = new AppTodoList({ getItems: async () => [], save: async () => spy() });
     todoList.add({ title: '' });
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
@@ -67,19 +66,16 @@ describe('AppTodoList', () => {
     await todoList.resolve();
     const [todo] = todoList.getItems();
     todo.toggleCompletion();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+add() should ignore error on save', async () => {
+  it('+add() should ignore error on save', () => {
     const api = { getItems: async () => [], save: () => Promise.resolve() };
     todoList = new AppTodoList(api);
     todoList.add({ title: '1' });
-    await delay();
     api.save = jasmine.createSpy().and.returnValue(Promise.reject('Mock saving failed'));
     todoList.add({ title: '2' });
     expect(todoList.getItems()).toHaveLength(2);
-    await delay();
     expect(api.save).toHaveBeenCalled();
     expect(todoList.getItems()).toHaveLength(2);
   });
@@ -88,27 +84,23 @@ describe('AppTodoList', () => {
     expect(todoList.getItems()).toHaveLength(0);
     expect(todoList.getHistory().getState()).toHaveLength(0);
     await todoList.resolve();
-    await delay();
     expect(todoList.getItems()).toHaveLength(1);
     expect(todoList.getHistory().getState()).toHaveLength(1);
   });
 
-  it('+add() should provide current todoList state to history', async () => {
+  it('+add() should provide current todoList state to history', () => {
     expect(todoList.getItems()).toHaveLength(0);
     expect(todoList.getHistory().getState()).toHaveLength(0);
     todoList.add({ title: '' });
-    await delay();
     expect(todoList.getItems()).toHaveLength(1);
     expect(todoList.getHistory().getState()).toHaveLength(1);
   });
 
-  it('+history.switchToPrev() should change todoList state on prev', async () => {
+  it('+history.switchToPrev() should change todoList state on prev', () => {
     todoList.add({ title: '' });
-    await delay();
     expect(todoList.getItems()).toHaveLength(1);
     expect(todoList.getHistory().getState()).toHaveLength(1);
     todoList.getHistory().switchToPrev();
-    await delay();
     expect(todoList.getHistory().getState()).toHaveLength(0);
     expect(todoList.getItems()).toHaveLength(0);
   });
@@ -116,23 +108,19 @@ describe('AppTodoList', () => {
   it('+history.switchToPrev() should change todoList state on prev after resolve()', async () => {
     await todoList.resolve();
     todoList.add({ title: '' });
-    await delay();
     expect(todoList.getItems()).toHaveLength(2);
     expect(todoList.getHistory().getState()).toHaveLength(2);
     todoList.getHistory().switchToPrev();
-    await delay();
     expect(todoList.getHistory().getState()).toHaveLength(1);
     expect(todoList.getItems()).toHaveLength(1);
   });
 
-  it('+add() should emit changes after history.switchToPrev()', async () => {
+  it('+add() should emit changes after history.switchToPrev()', () => {
     todoList.add({ title: '' });
     todoList.getHistory().switchToPrev();
-    await delay();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     todoList.add({ title: '' });
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 });

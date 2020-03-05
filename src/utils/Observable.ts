@@ -7,6 +7,10 @@ export interface Subscription {
 }
 
 export class Subject<T = unknown> implements Observable<T> {
+  protected static resolve(): PromiseLike {
+    return Promise.resolve();
+  }
+
   protected callbackSet: Set<(value: T) => void> = new Set();
 
   asObservable(): Observable<T> {
@@ -19,6 +23,21 @@ export class Subject<T = unknown> implements Observable<T> {
   }
 
   next(value: T): void {
-    Promise.resolve().then(() => this.callbackSet.forEach((onNext) => onNext(value)));
+    Subject.resolve().then(() => this.callbackSet.forEach((onNext) => onNext(value)));
+  }
+}
+
+interface PromiseLike {
+  then(callback: () => void): any;
+}
+
+export class SubjectTests extends Subject {
+  /** Make Subject.next() sync */
+  static useSyncResolver(): void {
+    Subject.resolve = () => ({ then: (callback) => callback() });
+  }
+
+  private constructor() {
+    super();
   }
 }

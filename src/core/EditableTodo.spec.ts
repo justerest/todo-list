@@ -1,4 +1,3 @@
-import { delay } from 'src/utils/delay';
 import { EditableTodo } from './EditableTodo';
 
 describe('EditableTodo', () => {
@@ -14,11 +13,10 @@ describe('EditableTodo', () => {
     expect(editableTodo.getTitle()).toBe(newTitle);
   });
 
-  it('+changeTitle() should emit changes', async () => {
+  it('+changeTitle() should emit changes', () => {
     const spy = jasmine.createSpy();
     editableTodo = new EditableTodo('description', false, spy);
     editableTodo.changeTitle('new title');
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 });

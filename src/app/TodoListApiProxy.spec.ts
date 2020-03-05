@@ -1,4 +1,5 @@
 import { delay } from 'src/utils/delay';
+import { SubjectTests } from 'src/utils/Observable';
 import { TodoListApi } from './TodoListApi';
 import { TodoListApiProxy } from './TodoListApiProxy';
 
@@ -7,15 +8,18 @@ describe('TodoListApiProxy', () => {
   let api: TodoListApi;
 
   beforeEach(() => {
-    api = { getItems: async () => [], save: () => delay(2) };
+    api = { getItems: async () => [], save: () => delay() };
     service = new TodoListApiProxy(api);
   });
 
-  it('+save() should emit saving true on start', async () => {
+  beforeAll(() => {
+    SubjectTests.useSyncResolver();
+  });
+
+  it('+save() should emit saving true on start', () => {
     const spy = jasmine.createSpy();
     service.saving.subscribe(spy);
     service.save([]);
-    await delay();
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(true);
   });
@@ -24,35 +28,31 @@ describe('TodoListApiProxy', () => {
     const spy = jasmine.createSpy();
     service.saving.subscribe(spy);
     await service.save([]);
-    await delay();
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenLastCalledWith(false);
   });
 
   it('+save() should emit saving false on error', async () => {
-    api.save = () => delay(2).then(() => Promise.reject());
+    api.save = () => delay().then(() => Promise.reject());
     const spy = jasmine.createSpy();
     service.saving.subscribe(spy);
     await service.save([]).catch(() => {});
-    await delay();
     expect(spy).toHaveBeenCalledTimes(2);
     expect(spy).toHaveBeenLastCalledWith(false);
   });
 
   it('+save() should emit error true on error', async () => {
-    api.save = () => delay(2).then(() => Promise.reject());
+    api.save = () => delay().then(() => Promise.reject());
     const spy = jasmine.createSpy();
     service.error.subscribe(spy);
     await service.save([]).catch(() => {});
-    await delay();
     expect(spy).toHaveBeenLastCalledWith(true);
   });
 
-  it('+save() should emit error false on start', async () => {
+  it('+save() should emit error false on start', () => {
     const spy = jasmine.createSpy();
     service.error.subscribe(spy);
     service.save([]);
-    await delay();
     expect(spy).toHaveBeenCalled();
     expect(spy).toHaveBeenCalledWith(false);
   });

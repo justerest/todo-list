@@ -1,8 +1,12 @@
-import { delay } from 'src/utils/delay';
+import { SubjectTests } from 'src/utils/Observable';
 import { TodoList, TodoListImp } from './TodoList';
 
 describe('TodoList', () => {
   let todoList: TodoList;
+
+  beforeAll(() => {
+    SubjectTests.useSyncResolver();
+  });
 
   beforeEach(() => {
     todoList = new TodoListImp();
@@ -49,22 +53,19 @@ describe('TodoList', () => {
     expect(todoList.getUncompletedItems()).toEqual([]);
   });
 
-  it('+add() should emit changes', async () => {
+  it('+add() should emit changes', () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     todoList.add({ title: 'description' });
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+todo.toggleCompletion() should emit changes', async () => {
+  it('+todo.toggleCompletion() should emit changes', () => {
     todoList.add({ title: 'title' });
-    await delay();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     const [item] = todoList.getItems();
     item.toggleCompletion();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 });

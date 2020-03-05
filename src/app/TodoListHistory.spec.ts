@@ -1,5 +1,5 @@
 import { TodoParams } from 'src/core/TodoFactory';
-import { delay } from 'src/utils/delay';
+import { SubjectTests } from 'src/utils/Observable';
 import { TodoListHistory } from './TodoListHistory';
 
 describe('TodoListHistory', () => {
@@ -7,6 +7,10 @@ describe('TodoListHistory', () => {
 
   beforeEach(() => {
     history = new TodoListHistory();
+  });
+
+  beforeAll(() => {
+    SubjectTests.useSyncResolver();
   });
 
   it('+getState() should returns TodoParams[]', () => {
@@ -85,36 +89,31 @@ describe('TodoListHistory', () => {
     expect(history.getState()).toBe(prevState);
   });
 
-  it('+setState() should not emit changes', async () => {
+  it('+setState() should not emit changes', () => {
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
     history.setState([]);
-    await delay();
     expect(spy).not.toHaveBeenCalled();
   });
 
-  it('+switchToPrev() should emit changes', async () => {
+  it('+switchToPrev() should emit changes', () => {
     history.setState([]);
-    await delay();
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
     history.switchToPrev();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+switchToPrev() should emit changes', async () => {
+  it('+switchToPrev() should emit changes', () => {
     history.setState([]);
     history.switchToPrev();
-    await delay();
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
     history.switchToNext();
-    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+reset() should reset history and apply initial state', async () => {
+  it('+reset() should reset history and apply initial state', () => {
     history.setState([]);
     expect(history.hasPrev()).toBe(true);
     const initState = [{ title: '' }] as TodoParams[];
