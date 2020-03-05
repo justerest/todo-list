@@ -16,7 +16,7 @@ describe('EditableTodo', () => {
 
   it('+changeTitle() should emit changes', async () => {
     const spy = jasmine.createSpy();
-    editableTodo = new EditableTodo('description', spy);
+    editableTodo = new EditableTodo('description', false, spy);
     editableTodo.changeTitle('new title');
     await delay();
     expect(spy).toHaveBeenCalled();

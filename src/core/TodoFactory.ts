@@ -9,6 +9,7 @@ export enum TodoType {
 }
 
 export interface TodoParams {
+  id?: string;
   title: string;
   type?: TodoType;
   completed?: boolean;
@@ -16,21 +17,30 @@ export interface TodoParams {
 
 export class TodoFactory {
   createTodo(todoParams: TodoParams, onChange?: () => void): Todo {
+    const todo = this.build(todoParams, onChange);
+    if (todoParams.id) {
+      todo.id = todoParams.id;
+    }
+    return todo;
+  }
+
+  private build(todoParams: TodoParams, onChange?: () => void): Todo {
     switch (todoParams.type) {
       case TodoType.Fixed: {
-        return new FixedTodo(todoParams.title, onChange);
+        return new FixedTodo(todoParams.title, todoParams.completed);
       }
       case TodoType.Editable: {
-        return new EditableTodo(todoParams.title, onChange);
+        return new EditableTodo(todoParams.title, todoParams.completed, onChange);
       }
       default: {
-        return new Todo(todoParams.title, onChange);
+        return new Todo(todoParams.title, todoParams.completed, onChange);
       }
     }
   }
 
   serializeTodo(todo: Todo): TodoParams {
     return {
+      id: todo.id,
       title: todo.getTitle(),
       completed: todo.isCompleted(),
       type:
