@@ -2,11 +2,14 @@ import React from 'react';
 
 import { TodoParams, TodoType } from 'src/core/TodoFactory';
 import { delay } from 'src/utils/delay';
+import { Subscription } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './TodoRenderer';
 
 export class App extends React.Component {
+  private subscriptions: Subscription[] = [];
+
   todoList: AppTodoList = this.createTodoList();
 
   render(): any {
@@ -26,8 +29,13 @@ export class App extends React.Component {
   }
 
   componentDidMount(): void {
-    this.todoList.changes.subscribe(() => this.forceUpdate());
+    this.subscriptions.push(this.todoList.changes.subscribe(() => this.forceUpdate()));
     this.todoList.resolve();
+  }
+
+  componentWillUnmount(): void {
+    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
+    this.todoList.destroy();
   }
 
   private createTodoList(): AppTodoList {
@@ -37,11 +45,11 @@ export class App extends React.Component {
       { title: 'Initial created Editable Todo', type: TodoType.Editable },
     ];
     return new AppTodoList({
-      getItems: async () => {
-        await delay(1000);
-        return todoParams;
-      },
-      save: () => delay(500),
+      getItems: () => delay(1000).then(() => todoParams),
+      save: () =>
+        delay(500)
+          .then(() => (Math.random() > 0.25 ? Promise.resolve() : Promise.reject()))
+          .catch(() => console.error('Saving fails')),
     });
   }
 }
