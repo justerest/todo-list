@@ -18,9 +18,7 @@ export interface TodoParams {
 export class TodoFactory {
   createTodo(todoParams: TodoParams, onChange?: () => void): Todo {
     const todo = this.build(todoParams, onChange);
-    if (todoParams.id) {
-      todo.id = todoParams.id;
-    }
+    todo.id = todoParams.id ?? this.generateId();
     return todo;
   }
 
@@ -36,6 +34,10 @@ export class TodoFactory {
         return new Todo(todoParams.title, todoParams.completed, onChange);
       }
     }
+  }
+
+  private generateId(): string {
+    return `${Math.random()}`.slice(2);
   }
 
   serializeTodo(todo: Todo): TodoParams {

@@ -1,8 +1,7 @@
 import { TodoRenderer } from '../app/todo-components/TodoRenderer';
-import { generateId } from '../utils/generateId';
 
 export class Todo {
-  id: string = generateId();
+  id: string = '';
 
   constructor(
     protected title: string,
