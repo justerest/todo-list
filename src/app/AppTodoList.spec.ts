@@ -1,6 +1,7 @@
 import { delay } from 'src/utils/delay';
 import { TodoType } from '../core/TodoFactory';
 import { AppTodoList } from './AppTodoList';
+import { TodoListHistory } from './TodoListHistory';
 
 describe('AppTodoList', () => {
   let todoList: AppTodoList;
@@ -21,7 +22,7 @@ describe('AppTodoList', () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     await todoList.resolve();
-    await delay(1);
+    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
@@ -29,7 +30,7 @@ describe('AppTodoList', () => {
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     todoList.add({ title: '' });
-    await delay(1);
+    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
@@ -38,18 +39,18 @@ describe('AppTodoList', () => {
     todoList.changes.subscribe(spy);
     await todoList.resolve();
     todoList.add({ title: '' });
-    await delay(1);
+    await delay();
     expect(spy).toHaveBeenCalledTimes(2);
   });
 
   it('+todo.onChange() should emit changes', async () => {
     await todoList.resolve();
-    await delay(1);
+    await delay();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     const [todo] = todoList.getItems();
     todo.toggleCompletion();
-    await delay(1);
+    await delay();
     expect(spy).toHaveBeenCalled();
   });
 
@@ -71,16 +72,68 @@ describe('AppTodoList', () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+add() should save todoList state on success and rollback to it on error', async () => {
+  it('+add() should ignore error on save', async () => {
     const api = { getItems: async () => [], save: () => Promise.resolve() };
     todoList = new AppTodoList(api);
     todoList.add({ title: '1' });
-    await delay(1);
-    const savedData = JSON.stringify(todoList.getItems());
-    api.save = () => Promise.reject('Mock saving failed');
+    await delay();
+    api.save = jasmine.createSpy().and.returnValue(Promise.reject('Mock saving failed'));
     todoList.add({ title: '2' });
     expect(todoList.getItems()).toHaveLength(2);
-    await delay(1);
-    expect(JSON.stringify(todoList.getItems())).toBe(savedData);
+    await delay();
+    expect(api.save).toHaveBeenCalled();
+    expect(todoList.getItems()).toHaveLength(2);
+  });
+
+  it('+resolve() should provide current todoList state to history', async () => {
+    expect(todoList.getItems()).toHaveLength(0);
+    expect(todoList.history.getState()).toHaveLength(0);
+    await todoList.resolve();
+    await delay();
+    expect(todoList.getItems()).toHaveLength(1);
+    expect(todoList.history.getState()).toHaveLength(1);
+  });
+
+  it('+add() should provide current todoList state to history', async () => {
+    expect(todoList.getItems()).toHaveLength(0);
+    expect(todoList.history.getState()).toHaveLength(0);
+    todoList.add({ title: '' });
+    await delay();
+    expect(todoList.getItems()).toHaveLength(1);
+    expect(todoList.history.getState()).toHaveLength(1);
+  });
+
+  it('+history.switchToPrev() should change todoList state on prev', async () => {
+    todoList.add({ title: '' });
+    await delay();
+    expect(todoList.getItems()).toHaveLength(1);
+    expect(todoList.history.getState()).toHaveLength(1);
+    todoList.history.switchToPrev();
+    await delay();
+    expect(todoList.history.getState()).toHaveLength(0);
+    expect(todoList.getItems()).toHaveLength(0);
+  });
+
+  it('+history.switchToPrev() should change todoList state on prev after resolve()', async () => {
+    await todoList.resolve();
+    todoList.add({ title: '' });
+    await delay();
+    expect(todoList.getItems()).toHaveLength(2);
+    expect(todoList.history.getState()).toHaveLength(2);
+    todoList.history.switchToPrev();
+    await delay();
+    expect(todoList.history.getState()).toHaveLength(1);
+    expect(todoList.getItems()).toHaveLength(1);
+  });
+
+  it('+add() should emit changes after history.switchToPrev()', async () => {
+    todoList.add({ title: '' });
+    todoList.history.switchToPrev();
+    await delay();
+    const spy = jasmine.createSpy();
+    todoList.changes.subscribe(spy);
+    todoList.add({ title: '' });
+    await delay();
+    expect(spy).toHaveBeenCalled();
   });
 });

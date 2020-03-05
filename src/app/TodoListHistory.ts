@@ -20,8 +20,8 @@ export class TodoListHistory {
 
   setState(state: TodoParams[]): void {
     this.deleteHistoryAfterCurrentState();
+    this.state = state;
     this.history.push(state);
-    this.nextState(state);
   }
 
   private nextState(state: TodoParams[]): void {

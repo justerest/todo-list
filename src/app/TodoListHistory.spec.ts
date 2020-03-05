@@ -85,12 +85,12 @@ describe('TodoListHistory', () => {
     expect(history.getState()).toBe(prevState);
   });
 
-  it('+setState() should emit changes', async () => {
+  it('+setState() should not emit changes', async () => {
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
     history.setState([]);
     await delay();
-    expect(spy).toHaveBeenCalled();
+    expect(spy).not.toHaveBeenCalled();
   });
 
   it('+switchToPrev() should emit changes', async () => {
