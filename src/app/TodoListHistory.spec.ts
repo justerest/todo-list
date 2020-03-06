@@ -89,11 +89,11 @@ describe('TodoListHistory', () => {
     expect(history.getState()).toBe(prevState);
   });
 
-  it('+setState() should not emit changes', () => {
+  it('+setState() should emit changes', () => {
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
     history.setState([]);
-    expect(spy).not.toHaveBeenCalled();
+    expect(spy).toHaveBeenCalled();
   });
 
   it('+switchToPrev() should emit changes', () => {
@@ -109,6 +109,30 @@ describe('TodoListHistory', () => {
     history.switchToPrev();
     const spy = jasmine.createSpy();
     history.changes.subscribe(spy);
+    history.switchToNext();
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('+setState() should not emit switched', () => {
+    const spy = jasmine.createSpy();
+    history.switched.subscribe(spy);
+    history.setState([]);
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('+switchToPrev() should emit switched', () => {
+    history.setState([]);
+    const spy = jasmine.createSpy();
+    history.switched.subscribe(spy);
+    history.switchToPrev();
+    expect(spy).toHaveBeenCalled();
+  });
+
+  it('+switchToPrev() should emit switched', () => {
+    history.setState([]);
+    history.switchToPrev();
+    const spy = jasmine.createSpy();
+    history.switched.subscribe(spy);
     history.switchToNext();
     expect(spy).toHaveBeenCalled();
   });

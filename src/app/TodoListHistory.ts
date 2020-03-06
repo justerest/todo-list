@@ -12,9 +12,11 @@ export interface HistoryControl<T extends object = {}> {
 
 export class TodoListHistory implements HistoryControl<TodoParams[]> {
   private changesSubject = new Subject();
+  private switchedSubject = new Subject();
   private history: TodoParams[][] = [this.state];
 
   changes: Observable = this.changesSubject.asObservable();
+  switched: Observable = this.switchedSubject.asObservable();
 
   constructor(private state: TodoParams[] = []) {}
 
@@ -30,12 +32,14 @@ export class TodoListHistory implements HistoryControl<TodoParams[]> {
   setState(state: TodoParams[]): void {
     this.deleteHistoryAfterCurrentState();
     this.state = state;
+    this.changesSubject.next({});
     this.history.push(state);
   }
 
   private nextState(state: TodoParams[]): void {
     this.state = state;
     this.changesSubject.next({});
+    this.switchedSubject.next({});
   }
 
   private deleteHistoryAfterCurrentState(): void {

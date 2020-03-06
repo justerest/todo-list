@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { TodoType } from 'src/core/TodoFactory';
-import { Observable, Subscription } from 'src/utils/Observable';
+import { Observable } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
 import { TodoRenderer } from './todo-components/TodoRenderer';
@@ -10,10 +10,9 @@ import { TodoListApiProxy } from './TodoListApiProxy';
 import { HistoryControl } from './TodoListHistory';
 
 export class App extends React.Component {
-  private subscriptions: Subscription[] = [];
-
   readonly todoListApiProxy = new TodoListApiProxy(new TodoListApiImp());
   readonly todoList = new AppTodoList(this.todoListApiProxy);
+  readonly todoRenderer = new TodoRenderer();
 
   render(): any {
     return (
@@ -22,7 +21,7 @@ export class App extends React.Component {
           <h1>Todo List App</h1>
         </header>
         <main>
-          <TodoListCmp todoList={this.todoList}></TodoListCmp>
+          <TodoListCmp todoList={this.todoList} todoRenderer={this.todoRenderer}></TodoListCmp>
           <AddTodoCmp todoList={this.todoList}></AddTodoCmp>
           <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
           <AddEditableTodoCmp todoList={this.todoList}></AddEditableTodoCmp>
@@ -36,18 +35,19 @@ export class App extends React.Component {
   }
 
   componentDidMount(): void {
-    this.subscriptions.push(this.todoList.changes.subscribe(() => this.forceUpdate()));
     this.todoList.resolve();
   }
 
   componentWillUnmount(): void {
-    this.subscriptions.forEach((subscription) => subscription.unsubscribe());
     this.todoList.destroy();
   }
 }
 
-export const TodoListCmp: React.FC<{ todoList: TodoList }> = ({ todoList }) => {
-  const todoRenderer = new TodoRenderer();
+export const TodoListCmp: React.FC<{
+  todoList: TodoList;
+  todoRenderer: TodoRenderer;
+}> = ({ todoList, todoRenderer }) => {
+  useObservable(todoList.changes);
   return (
     <div>
       <h2>What to do?</h2>

@@ -16,7 +16,7 @@ export class AppTodoList implements TodoList {
   private stateSubscription: Subscription = this.state.changes.subscribe(() =>
     this.onStateChanges(),
   );
-  private historySubscription = this.history.changes.subscribe(() => this.onHistoryChanges());
+  private historySubscription = this.history.switched.subscribe(() => this.onHistorySwitched());
 
   constructor(private api: TodoListApi) {}
 
@@ -27,7 +27,7 @@ export class AppTodoList implements TodoList {
     this.changesSubject.next({});
   }
 
-  private onHistoryChanges(): void {
+  private onHistorySwitched(): void {
     const params = this.history.getState();
     this.updateStateTodoList(params);
     this.api.save(params).catch(() => {});
