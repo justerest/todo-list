@@ -42,6 +42,8 @@ describe('AppTodoList', () => {
     await todoList.resolve();
     todoList.add({ title: '' });
     expect(spy).toHaveBeenCalledTimes(2);
+    todoList.add({ title: '' });
+    expect(spy).toHaveBeenCalledTimes(3);
   });
 
   it('+todo.onChange() should emit changes', async () => {
@@ -122,5 +124,34 @@ describe('AppTodoList', () => {
     todoList.changes.subscribe(spy);
     todoList.add({ title: '' });
     expect(spy).toHaveBeenCalled();
+  });
+
+  it('+history.switchToNext() should switch on next state', () => {
+    const history = todoList.getHistory();
+    todoList.add({ title: '' });
+    history.switchToPrev();
+    history.switchToNext();
+    expect(todoList.getItems().length).toBe(1);
+  });
+
+  it('+history.hasPrev() should returns false after resolve', async () => {
+    await todoList.resolve();
+    const history = todoList.getHistory();
+    expect(history.hasPrev()).toBe(false);
+  });
+
+  it('+history.hasNext() should returns false after resolve', async () => {
+    await todoList.resolve();
+    const history = todoList.getHistory();
+    expect(history.hasNext()).toBe(false);
+  });
+
+  it('+add() should add Todo after resolve()', async () => {
+    await todoList.resolve();
+    const initTodoCount = todoList.getItems().length;
+    todoList.add({ title: '' });
+    expect(todoList.getItems()).toHaveLength(initTodoCount + 1);
+    todoList.add({ title: '' });
+    expect(todoList.getItems()).toHaveLength(initTodoCount + 2);
   });
 });
