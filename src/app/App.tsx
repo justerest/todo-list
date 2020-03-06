@@ -125,6 +125,6 @@ function useObservable<T>(observable: Observable<T>): T | undefined {
   useEffect(() => {
     const subscription = observable.subscribe((value) => update(value));
     return () => subscription.unsubscribe();
-  });
+  }, [0]);
   return result;
 }
