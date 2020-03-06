@@ -4,10 +4,10 @@ import { TodoType } from 'src/core/TodoFactory';
 import { Observable } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
 import { AppTodoList } from './AppTodoList';
+import { HistoryControl } from './HistoryState';
 import { TodoRenderer } from './todo-components/TodoRenderer';
 import { TodoListApiImp } from './TodoListApi';
 import { TodoListApiProxy } from './TodoListApiProxy';
-import { HistoryControl } from './TodoListHistory';
 
 export class App extends React.Component {
   readonly todoListApiProxy = new TodoListApiProxy(new TodoListApiImp());

@@ -1,12 +1,11 @@
-import { TodoParams } from 'src/core/TodoFactory';
 import { SubjectTests } from 'src/utils/Observable';
-import { TodoListHistory } from './TodoListHistory';
+import { HistoryState } from './HistoryState';
 
-describe('TodoListHistory', () => {
-  let history: TodoListHistory;
+describe('HistoryState', () => {
+  let history: HistoryState;
 
   beforeEach(() => {
-    history = new TodoListHistory();
+    history = new HistoryState([]);
   });
 
   beforeAll(() => {
@@ -18,7 +17,7 @@ describe('TodoListHistory', () => {
   });
 
   it('+setState() should rewrite current state', () => {
-    const newState = [{ title: '' }] as TodoParams[];
+    const newState = [{}];
     history.setState(newState);
     expect(history.getState()).toBe(newState);
   });
@@ -33,7 +32,7 @@ describe('TodoListHistory', () => {
   });
 
   it('+switchToPrev() should switch on prev state', () => {
-    const prevState = [{ title: '' }] as TodoParams[];
+    const prevState = [{}];
     history.setState(prevState);
     history.setState([]);
     history.switchToPrev();
@@ -57,7 +56,7 @@ describe('TodoListHistory', () => {
   });
 
   it('+switchToNext() should switch on next state', () => {
-    const prevState = [{ title: '' }] as TodoParams[];
+    const prevState = [{}];
     history.setState([]);
     history.setState(prevState);
     history.switchToPrev();
@@ -80,7 +79,7 @@ describe('TodoListHistory', () => {
   });
 
   it('+switchToPrev() should switch on prev state after setState()', () => {
-    const prevState = [{ title: '' }] as TodoParams[];
+    const prevState = [{}];
     history.setState(prevState);
     history.setState([]);
     history.switchToPrev();
@@ -140,9 +139,16 @@ describe('TodoListHistory', () => {
   it('+reset() should reset history and apply initial state', () => {
     history.setState([]);
     expect(history.hasPrev()).toBe(true);
-    const initState = [{ title: '' }] as TodoParams[];
+    const initState = [{}];
     history.reset(initState);
     expect(history.hasPrev()).toBe(false);
     expect(history.getState()).toBe(initState);
+  });
+
+  it('+reset() should emit changes', () => {
+    const spy = jasmine.createSpy();
+    history.changes.subscribe(spy);
+    history.reset([]);
+    expect(spy).toHaveBeenCalled();
   });
 });
