@@ -1,4 +1,4 @@
-export interface Observable<T = unknown> {
+export interface Observable<T = {}> {
   subscribe(onNext: (value: T) => void): Subscription;
 }
 
@@ -6,7 +6,7 @@ export interface Subscription {
   unsubscribe(): void;
 }
 
-export class Subject<T = unknown> implements Observable<T> {
+export class Subject<T = {}> implements Observable<T> {
   protected static resolve(): PromiseLike {
     return Promise.resolve();
   }

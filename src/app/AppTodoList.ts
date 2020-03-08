@@ -5,7 +5,7 @@ import { TodoList, TodoListImp } from '../core/TodoList';
 import { HistoryControl, HistoryState } from './HistoryState';
 import { TodoListApi } from './TodoListApi';
 
-export class AppTodoList implements TodoList {
+export class AppTodoList implements TodoList, HistoryControl {
   private readonly todoFactory = new TodoFactory();
   private readonly history: HistoryState<TodoParams[]> = new HistoryState([]);
 
@@ -16,13 +16,12 @@ export class AppTodoList implements TodoList {
   private stateSubscription: Subscription = this.state.changes.subscribe(() =>
     this.onTodoListChanges(),
   );
-  private historySubscription = this.history.switched.subscribe(() => this.onHistorySwitched());
 
   constructor(private api: TodoListApi) {}
 
   private onTodoListChanges(): void {
     const params = this.state.getItems().map((todo) => this.todoFactory.serializeTodo(todo));
-    this.history.setState(params);
+    this.history.addState(params);
     this.api.save(params).catch(() => {});
     this.changesSubject.next({});
   }
@@ -34,11 +33,14 @@ export class AppTodoList implements TodoList {
   }
 
   private updateState(todoParamsList: TodoParams[]): void {
-    const todoList = new TodoListImp(todoParamsList);
-    this.state = todoList;
+    this.state = new TodoListImp(todoParamsList);
+    this.updateStateSubscription();
+    this.changesSubject.next({});
+  }
+
+  private updateStateSubscription(): void {
     this.stateSubscription.unsubscribe();
     this.stateSubscription = this.state.changes.subscribe(() => this.onTodoListChanges());
-    this.changesSubject.next({});
   }
 
   async resolve(): Promise<void> {
@@ -49,11 +51,6 @@ export class AppTodoList implements TodoList {
 
   destroy(): void {
     this.stateSubscription.unsubscribe();
-    this.historySubscription.unsubscribe();
-  }
-
-  getHistory(): HistoryControl<TodoParams[]> {
-    return this.history;
   }
 
   getItems(): Todo[] {
@@ -70,5 +67,23 @@ export class AppTodoList implements TodoList {
 
   add(todoParams: TodoParams): void {
     this.state.add(todoParams);
+  }
+
+  canUndo(): boolean {
+    return this.history.hasPrev();
+  }
+
+  canRedo(): boolean {
+    return this.history.hasNext();
+  }
+
+  undo(): void {
+    this.history.switchToPrev();
+    this.onHistorySwitched();
+  }
+
+  redo(): void {
+    this.history.switchToNext();
+    this.onHistorySwitched();
   }
 }

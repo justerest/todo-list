@@ -1,21 +1,14 @@
-import { Observable, Subject } from 'src/utils/Observable';
+import { Observable } from 'src/utils/Observable';
 
-export interface HistoryControl<T extends object = {}> {
+export interface HistoryControl {
   changes: Observable;
-  hasPrev(): boolean;
-  hasNext(): boolean;
-  getState(): T;
-  switchToPrev(): void;
-  switchToNext(): void;
+  canUndo(): boolean;
+  canRedo(): boolean;
+  undo(): void;
+  redo(): void;
 }
 
-export class HistoryState<T extends object = {}> implements HistoryControl<T> {
-  private changesSubject: Subject = new Subject();
-  private switchedSubject: Subject = new Subject();
-
-  changes: Observable = this.changesSubject.asObservable();
-  switched: Observable = this.switchedSubject.asObservable();
-
+export class HistoryState<T extends object = {}> {
   private history: T[] = [this.state];
 
   constructor(private state: T) {}
@@ -32,10 +25,9 @@ export class HistoryState<T extends object = {}> implements HistoryControl<T> {
     return this.getCurrentStateIndex() < this.history.length - 1;
   }
 
-  setState(state: T): void {
+  addState(state: T): void {
     this.deleteHistoryAfterCurrentState();
     this.state = state;
-    this.changesSubject.next({});
     this.history.push(state);
   }
 
@@ -46,23 +38,16 @@ export class HistoryState<T extends object = {}> implements HistoryControl<T> {
   reset(state: T): void {
     this.state = state;
     this.history = [this.state];
-    this.changesSubject.next({});
   }
 
   switchToPrev(): void {
     const prevStateIndex = Math.max(this.getCurrentStateIndex() - 1, 0);
-    this.switchState(this.history[prevStateIndex]);
-  }
-
-  private switchState(state: T): void {
-    this.state = state;
-    this.changesSubject.next({});
-    this.switchedSubject.next({});
+    this.state = this.history[prevStateIndex];
   }
 
   switchToNext(): void {
     const nextStateIndex = Math.min(this.getCurrentStateIndex() + 1, this.history.length - 1);
-    this.switchState(this.history[nextStateIndex]);
+    this.state = this.history[nextStateIndex];
   }
 
   private getCurrentStateIndex(): number {

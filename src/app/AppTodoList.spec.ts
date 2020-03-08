@@ -82,68 +82,45 @@ describe('AppTodoList', () => {
     expect(todoList.getItems()).toHaveLength(2);
   });
 
-  it('+resolve() should provide current todoList state to history', async () => {
-    expect(todoList.getItems()).toHaveLength(0);
-    expect(todoList.getHistory().getState()).toHaveLength(0);
-    await todoList.resolve();
-    expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.getHistory().getState()).toHaveLength(1);
-  });
-
-  it('+add() should provide current todoList state to history', () => {
-    expect(todoList.getItems()).toHaveLength(0);
-    expect(todoList.getHistory().getState()).toHaveLength(0);
+  it('+undo() should change todoList state on prev', () => {
     todoList.add({ title: '' });
     expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.getHistory().getState()).toHaveLength(1);
-  });
-
-  it('+history.switchToPrev() should change todoList state on prev', () => {
-    todoList.add({ title: '' });
-    expect(todoList.getItems()).toHaveLength(1);
-    expect(todoList.getHistory().getState()).toHaveLength(1);
-    todoList.getHistory().switchToPrev();
-    expect(todoList.getHistory().getState()).toHaveLength(0);
+    todoList.undo();
     expect(todoList.getItems()).toHaveLength(0);
   });
 
-  it('+history.switchToPrev() should change todoList state on prev after resolve()', async () => {
+  it('+undo() should change todoList state on prev after resolve()', async () => {
     await todoList.resolve();
     todoList.add({ title: '' });
     expect(todoList.getItems()).toHaveLength(2);
-    expect(todoList.getHistory().getState()).toHaveLength(2);
-    todoList.getHistory().switchToPrev();
-    expect(todoList.getHistory().getState()).toHaveLength(1);
+    todoList.undo();
     expect(todoList.getItems()).toHaveLength(1);
   });
 
   it('+add() should emit changes after history.switchToPrev()', () => {
     todoList.add({ title: '' });
-    todoList.getHistory().switchToPrev();
+    todoList.undo();
     const spy = jasmine.createSpy();
     todoList.changes.subscribe(spy);
     todoList.add({ title: '' });
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+history.switchToNext() should switch on next state', () => {
-    const history = todoList.getHistory();
+  it('+redo() should switch on next state', () => {
     todoList.add({ title: '' });
-    history.switchToPrev();
-    history.switchToNext();
+    todoList.undo();
+    todoList.redo();
     expect(todoList.getItems().length).toBe(1);
   });
 
-  it('+history.hasPrev() should returns false after resolve', async () => {
+  it('+canUndo() should returns false after resolve', async () => {
     await todoList.resolve();
-    const history = todoList.getHistory();
-    expect(history.hasPrev()).toBe(false);
+    expect(todoList.canUndo()).toBe(false);
   });
 
-  it('+history.hasNext() should returns false after resolve', async () => {
+  it('+canRedo() should returns false after resolve', async () => {
     await todoList.resolve();
-    const history = todoList.getHistory();
-    expect(history.hasNext()).toBe(false);
+    expect(todoList.canRedo()).toBe(false);
   });
 
   it('+add() should add Todo after resolve()', async () => {

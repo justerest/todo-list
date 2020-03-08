@@ -25,7 +25,7 @@ export class App extends React.Component {
           <AddTodoCmp todoList={this.todoList}></AddTodoCmp>
           <AddFixedTodoCmp todoList={this.todoList}></AddFixedTodoCmp>
           <AddEditableTodoCmp todoList={this.todoList}></AddEditableTodoCmp>
-          <HistoryControlCmp historyControl={this.todoList.getHistory()}></HistoryControlCmp>
+          <HistoryControlCmp historyControl={this.todoList}></HistoryControlCmp>
         </main>
         <footer>
           <SavingStatusCmp todoListApiProxy={this.todoListApiProxy}></SavingStatusCmp>
@@ -109,11 +109,11 @@ export const HistoryControlCmp: React.FC<{
   useObservable(historyControl.changes);
   return (
     <p>
-      <button disabled={!historyControl.hasPrev()} onClick={() => historyControl.switchToPrev()}>
+      <button disabled={!historyControl.canUndo()} onClick={() => historyControl.undo()}>
         ↪️
       </button>
       &nbsp;
-      <button disabled={!historyControl.hasNext()} onClick={() => historyControl.switchToNext()}>
+      <button disabled={!historyControl.canRedo()} onClick={() => historyControl.redo()}>
         ↩️
       </button>
     </p>
