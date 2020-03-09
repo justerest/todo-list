@@ -27,14 +27,19 @@ export class Subject<T = {}> implements Observable<T> {
   }
 }
 
-interface PromiseLike {
-  then(callback: () => void): any;
+class PromiseLike {
+  constructor() {}
+
+  then(callback: () => void): PromiseLike {
+    callback();
+    return this;
+  }
 }
 
 export class SubjectTests extends Subject {
   /** Make Subject.next() sync */
   static useSyncResolver(): void {
-    Subject.resolve = () => ({ then: (callback) => callback() });
+    Subject.resolve = () => new PromiseLike();
   }
 
   private constructor() {

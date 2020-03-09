@@ -1,13 +1,13 @@
 import { delay } from 'src/utils/delay';
 import { SubjectTests } from 'src/utils/Observable';
 import { TodoType } from '../core/TodoFactory';
-import { AppTodoList } from './AppTodoList';
+import { ResolvableTodoList } from './ResolvableTodoList';
 
-describe('AppTodoList', () => {
-  let todoList: AppTodoList;
+describe('ResolvableTodoList', () => {
+  let todoList: ResolvableTodoList;
 
   beforeEach(() => {
-    todoList = new AppTodoList({
+    todoList = new ResolvableTodoList({
       getItems: async () => [{ type: TodoType.Simple, title: 'Loaded todo', completed: false }],
       save: () => delay(),
     });
@@ -57,29 +57,31 @@ describe('AppTodoList', () => {
 
   it('+add() should call TodoListApi.save', () => {
     const spy = jasmine.createSpy();
-    todoList = new AppTodoList({ getItems: async () => [], save: async () => spy() });
+    todoList = new ResolvableTodoList({ getItems: async () => [], save: async () => spy() });
     todoList.add({ title: '' });
     expect(spy).toHaveBeenCalled();
   });
 
   it('+todo.onChange() should call TodoListApi.save', async () => {
     const spy = jasmine.createSpy();
-    todoList = new AppTodoList({ getItems: async () => [{ title: '' }], save: async () => spy() });
+    todoList = new ResolvableTodoList({
+      getItems: async () => [{ title: '' }],
+      save: async () => spy(),
+    });
     await todoList.resolve();
     const [todo] = todoList.getItems();
     todo.toggleCompletion();
     expect(spy).toHaveBeenCalled();
   });
 
-  it('+add() should ignore error on save', () => {
+  it('+add() should prevent changes on save error', async () => {
     const api = { getItems: async () => [], save: () => Promise.resolve() };
-    todoList = new AppTodoList(api);
-    todoList.add({ title: '1' });
     api.save = jasmine.createSpy().and.returnValue(Promise.reject('Mock saving failed'));
-    todoList.add({ title: '2' });
-    expect(todoList.getItems()).toHaveLength(2);
+    todoList = new ResolvableTodoList(api);
+    todoList.add({ title: '' });
     expect(api.save).toHaveBeenCalled();
-    expect(todoList.getItems()).toHaveLength(2);
+    await delay();
+    expect(todoList.getItems()).toHaveLength(0);
   });
 
   it('+undo() should change todoList state on prev', () => {

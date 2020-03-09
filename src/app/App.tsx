@@ -3,15 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { TodoType } from 'src/core/TodoFactory';
 import { Observable } from 'src/utils/Observable';
 import { TodoList } from '../core/TodoList';
-import { AppTodoList } from './AppTodoList';
 import { HistoryControl } from './HistoryState';
+import { ResolvableTodoList } from './ResolvableTodoList';
 import { TodoRenderer } from './todo-components/TodoRenderer';
 import { TodoListApiImp } from './TodoListApi';
 import { TodoListApiProxy } from './TodoListApiProxy';
 
 export class App extends React.Component {
   readonly todoListApiProxy = new TodoListApiProxy(new TodoListApiImp());
-  readonly todoList = new AppTodoList(this.todoListApiProxy);
+  readonly todoList = new ResolvableTodoList(this.todoListApiProxy);
   readonly todoRenderer = new TodoRenderer();
 
   render(): any {

@@ -3,36 +3,31 @@ import { Observable, Subject, Subscription } from 'src/utils/Observable';
 import { TodoFactory, TodoParams } from '../core/TodoFactory';
 import { TodoList, TodoListImp } from '../core/TodoList';
 import { HistoryControl, HistoryState } from './HistoryState';
-import { TodoListApi } from './TodoListApi';
 
-export class AppTodoList implements TodoList, HistoryControl {
-  private readonly todoFactory = new TodoFactory();
-  private readonly history: HistoryState<TodoParams[]> = new HistoryState([]);
+export class HistoricalTodoList implements TodoList, HistoryControl {
+  protected readonly todoFactory = new TodoFactory();
+  protected readonly history = new HistoryState<TodoParams[]>([]);
 
   private changesSubject: Subject = new Subject();
   readonly changes: Observable = this.changesSubject.asObservable();
 
   private state: TodoList = new TodoListImp();
   private stateSubscription: Subscription = this.state.changes.subscribe(() =>
-    this.onTodoListChanges(),
+    this.onStateChanged(this.getSerializedState()),
   );
 
-  constructor(private api: TodoListApi) {}
+  constructor() {}
 
-  private onTodoListChanges(): void {
-    const params = this.state.getItems().map((todo) => this.todoFactory.serializeTodo(todo));
+  protected onStateChanged(params: TodoParams[]): void {
     this.history.addState(params);
-    this.api.save(params).catch(() => {});
     this.changesSubject.next({});
   }
 
-  private onHistorySwitched(): void {
-    const params = this.history.getState();
-    this.updateState(params);
-    this.api.save(params).catch(() => {});
+  protected onHistorySwitched(): void {
+    this.updateState(this.history.getState());
   }
 
-  private updateState(todoParamsList: TodoParams[]): void {
+  protected updateState(todoParamsList: TodoParams[]): void {
     this.state = new TodoListImp(todoParamsList);
     this.updateStateSubscription();
     this.changesSubject.next({});
@@ -40,13 +35,13 @@ export class AppTodoList implements TodoList, HistoryControl {
 
   private updateStateSubscription(): void {
     this.stateSubscription.unsubscribe();
-    this.stateSubscription = this.state.changes.subscribe(() => this.onTodoListChanges());
+    this.stateSubscription = this.state.changes.subscribe(() =>
+      this.onStateChanged(this.getSerializedState()),
+    );
   }
 
-  async resolve(): Promise<void> {
-    const todoParamsList = await this.api.getItems();
-    this.history.reset(todoParamsList);
-    this.updateState(todoParamsList);
+  private getSerializedState(): TodoParams[] {
+    return this.state.getItems().map((todo) => this.todoFactory.serializeTodo(todo));
   }
 
   destroy(): void {
