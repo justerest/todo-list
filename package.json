@@ -9,7 +9,7 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "react-dom": "^16.13.0",
     "react": "^16.13.0",
     "rxjs": "^6.5.4"
